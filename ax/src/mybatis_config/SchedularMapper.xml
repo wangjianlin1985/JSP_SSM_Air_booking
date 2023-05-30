@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.fly.SchedularDao">
+    
+    
+    <select id="findListByMap" parameterType="java.util.Map" resultType="schedular">
+        select a.id,
+        	a.name,
+        	b.id as "orderid",
+        	b.customerid ,
+        	c.cname 
+        from schedular a left join orders b on a.id = b.schedularid
+        left join customer c on b.customerid = c.id
+        where a.flightid = #{flightid} and a.date = #{date}
+        
+    </select>
+	
+    <select id="findHB"  parameterType="java.util.Map" resultType="hb">
+        SELECT  
+        	t.flightid as "flightid",
+        	t.price as "price",
+        	b.code as "code",
+        	b.start as "start",
+        	b.end as "end",
+        	c.model as "planemodel",
+        	d.name as "oport",
+        	e.name as "dport"
+        FROM (
+
+			SELECT flightid,DATE,price	
+				FROM schedular a 
+				GROUP BY flightid,DATE,price
+				HAVING DATE = #{date}) t
+				LEFT JOIN flight b ON t.flightid  = b.id
+				
+				left join plane c on b.planeid = c.id
+        	left join airport d on b.originport = d.id
+        	left join airport e on b.destinationport = e.id
+        	WHERE b.`origincity` = #{o} AND
+				b.`destinationcity` =  #{d}
+    </select>
+    
+    
+	<select id="findList" parameterType="schedular" resultType="schedular">
+		select a.id,
+			a.name,
+			a.date,
+			a.price,
+			a.week,
+			b.id as "flight.id",
+			b.code as "flight.code" 
+		from schedular a left join flight b on a.flightid = b.id where 1 = 1
+        <if test="flight != null and flight.id != null  and '' != flight.id">  
+            <![CDATA[  
+              AND a.flightid = #{flight.id} 
+            ]]>  
+        </if>
+        <if test="start!=null and ''!=start">
+            <![CDATA[   and a.date >= #{start} ]]>  
+        </if>
+         <if test="end!=null and ''!=end">
+            <![CDATA[   and a.date <= #{end} ]]>  
+        </if>
+        <if test="keyword != null and ''!= keyword">
+			AND (a.name like '%' #{keyword} '%' or  b.code like '%' #{keyword} '%')      
+        </if>
+        order by b.code ,a.name
+        <if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	
+
+	<select id="count" parameterType="schedular" resultType="int">
+		select count(*)
+		from schedular a left join flight b on a.flightid = b.id where 1 = 1
+        <if test="flight != null and flight.id != null  and '' != flight.id">  
+            <![CDATA[  
+              AND a.flightid = #{flight.id} 
+            ]]>  
+        </if>
+        <if test="start!=null and ''!=start">
+            <![CDATA[   and a.date >= #{start} ]]>  
+        </if>
+        <if test="end!=null and ''!=end">
+            <![CDATA[   and a.date <= #{end} ]]>  
+        </if>
+        <if test="keyword != null and ''!= keyword">
+			AND (a.name like '%' #{keyword} '%' or  b.code like '%' #{keyword} '%')      
+        </if>
+	</select>
+	
+	
+	
+	<select id="findGroupList"  parameterType="schedular" resultType="schedular">
+		select  
+			date,code as "flight.code" ,week,count(*) as "totalnum",a.`flightid` AS "flight.id"
+		from schedular a left join 
+		flight b on a.flightid = b.id where 1 = 1
+        <if test="start!=null and ''!=start">
+            <![CDATA[   and a.date >= #{start} ]]>  
+        </if>
+         <if test="end!=null and ''!=end">
+            <![CDATA[   and a.date <= #{end} ]]>  
+        </if>
+        <if test="keyword != null and ''!= keyword">
+			AND (a.name like '%' #{keyword} '%' or  b.code like '%' #{keyword} '%')      
+        </if>
+        group by date,week,flightid
+        order by date desc
+        <if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+     </select>  
+     
+	
+	
+	<select id="countGroupList"  parameterType="schedular" resultType="int">
+		select count(*) from (select  
+			date,code,week,count(*) as "totalnum"
+		from schedular a left join 
+		flight b on a.flightid = b.id where 1 = 1
+        <if test="start!=null and ''!=start">
+            <![CDATA[   and a.date >= #{start} ]]>  
+        </if>
+         <if test="end!=null and ''!=end">
+            <![CDATA[   and a.date <= #{end} ]]>  
+        </if>
+        <if test="keyword != null and ''!= keyword">
+			AND (a.name like '%' #{keyword} '%' or  b.code like '%' #{keyword} '%')      
+        </if>
+        group by date,week,flightid
+        ) t 
+     </select>  
+	
+	
+	
+	
+	<insert id="add" parameterType="schedular">
+		insert into schedular(id,name,week,flightid,date,price) 
+			values(#{id},#{name},#{week},#{flight.id},#{date},#{price})
+	</insert>
+	
+	
+	<update id="update" parameterType="schedular">
+		
+	</update>
+	
+	
+	<delete id="delete" parameterType="schedular">
+		delete from schedular where id = #{id}
+	</delete>
+	
+	<delete id="deleteByFlightAndDate" parameterType="schedular">
+		delete from schedular where flightid = #{flight.id} and date = #{date}
+	</delete>
+	
+	<delete id="deleteBatch" parameterType="java.util.List">
+		delete from schedular 
+		WHERE id IN(
+		<foreach item="o" collection="list" open="" separator="," close="" >
+			#{o.id}
+		</foreach>
+		)
+	</delete>
+	
+	
+	<select id="findSchedularByFlightidAndDate"  parameterType="java.util.Map" resultType="schedular" >
+		SELECT 
+			a.id as "id",
+			a.week as "week",
+			a.date as "date",
+			a.price as "price",
+			a.name as "name",
+			b.id as "flight.id",
+			b.code as "flight.code"
+		FROM
+		schedular a LEFT JOIN flight b ON a.flightid = b.id
+		LEFT JOIN orders c ON a.id = c.schedularid
+		WHERE a.flightid = #{flightid}
+		AND a.date = #{date} AND (c.status IS NULL) 
+	</select>
+	
+	
+</mapper>

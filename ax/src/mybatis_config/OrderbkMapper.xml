@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.fly.OrderbkDao">
+	
+	<insert id="add" parameterType="orderbk">
+	    insert into ordersbk (id,schedularid,customerid,time,tptime)
+	    values(#{id},#{schedular.id},#{customer.id},#{time},#{tptime})
+	</insert>
+	
+	
+		<select id="findOne"  parameterType="orderbk" resultType="orderbk">
+	    select
+	    	a.id as "id",
+	    	a.time as "time",
+	    	a.tptime as "tptime",
+	    	b.cname as "customer.cname",
+	    	b.phone as "customer.phone",
+	    	b.id as "customer.id",
+	    	c.date as "schedular.date",
+	    	c.id as "schedular.id",
+	    	c.price as "schedular.price",
+	    	c.name as "schedular.name",
+	    	d.id as "schedular.flight.id",
+	    	d.code as "schedular.flight.code",
+	    	d.start as "schedular.flight.start",
+	    	d.end as "schedular.flight.end",
+	    	d.origincity as "schedular.flight.origincity.id",
+	    	e.name as "schedular.flight.origincity.name",
+	    	d.destinationcity as "schedular.flight.destinationcity.id",
+	    	f.name as "schedular.flight.destinationcity.name",
+	    	d.originport as "schedular.flight.originport.id",
+	    	g.name as "schedular.flight.originport.name",
+	    	d.destinationcity as "schedular.flight.destinationport.id",
+	    	h.name as "schedular.flight.destinationport.name"
+	    from ordersbk a 
+	    left join customer b on a.customerid = b.id
+	    left join schedular c on a.schedularid = c.id 
+	    left join flight d on c.flightid = d.id
+	    left join city e on d.origincity = e.id
+	    left join city f on d.destinationcity = f.id
+	    left join airport g on d.originport = g.id
+	    left join airport h on d.destinationport = h.id
+	    where a.id = #{id}
+	</select>
+	
+	
+	
+	
+	
+	<select id="findList"  parameterType="orderbk" resultType="orderbk">
+	    select
+	    	a.id as "id",
+	    	a.time as "time",
+	    	a.tptime as "tptime",
+	    	b.cname as "customer.cname",
+	    	b.phone as "customer.phone",
+	    	b.id as "customer.id",
+	    	c.date as "schedular.date",
+	    	c.id as "schedular.id",
+	    	c.price as "schedular.price",
+	    	c.name as "schedular.name",
+	    	d.id as "schedular.flight.id",
+	    	d.code as "schedular.flight.code",
+	    	d.start as "schedular.flight.start",
+	    	d.end as "schedular.flight.end",
+	    	d.origincity as "schedular.flight.origincity.id",
+	    	e.name as "schedular.flight.origincity.name",
+	    	d.destinationcity as "schedular.flight.destinationcity.id",
+	    	f.name as "schedular.flight.destinationcity.name",
+	    	d.originport as "schedular.flight.originport.id",
+	    	g.name as "schedular.flight.originport.name",
+	    	d.destinationcity as "schedular.flight.destinationport.id",
+	    	h.name as "schedular.flight.destinationport.name"
+	    from ordersbk a 
+	    left join customer b on a.customerid = b.id
+	    left join schedular c on a.schedularid = c.id 
+	    left join flight d on c.flightid = d.id
+	    left join city e on d.origincity = e.id
+	    left join city f on d.destinationcity = f.id
+	    left join airport g on d.originport = g.id
+	    left join airport h on d.destinationport = h.id
+	    where 1 = 1
+	    <if test="customer != null and customer.id!=null">
+	        and b.id = #{customer.id}
+	    </if>
+	    <if test="customer != null and customer.cname!=null and ''!=customer.cname">
+	        and (b.cname like '%' #{customer.cname} '%' or b.email like '%' #{customer.cname} or b.phone like '%' #{customer.cname} )
+	    </if>
+	    <if test="start!=null and ''!=start">
+            <![CDATA[   and a.tptime >= #{start} ]]>  
+        </if>
+         <if test="end!=null and ''!=end">
+            <![CDATA[   and a.tptime <= #{end} ]]>  
+        </if>
+        <if test="date != null and ''!=date">
+            and c.date = #{date}
+        </if>
+        <if test="schedular!=null and schedular.flight!=null and schedular.flight.id != null">
+            and d.id = #{schedular.flight.id}
+        </if>
+        order by a.time desc
+        <if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	
+	
+	
+	<select id="count"  parameterType="orderbk" resultType="int">
+	    select
+	    	count(*)
+	    from ordersbk a 
+	    left join customer b on a.customerid = b.id
+	    left join schedular c on a.schedularid = c.id 
+	    left join flight d on c.flightid = d.id
+	    left join city e on d.origincity = e.id
+	    left join city f on d.destinationcity = f.id
+	    left join airport g on d.originport = g.id
+	    left join airport h on d.destinationport = h.id
+	    where 1 = 1
+	    <if test="customer != null and customer.id!=null">
+	        and b.id = #{customer.id}
+	    </if>
+	    <if test="customer != null and customer.cname!=null and ''!=customer.cname">
+	        and (b.cname like '%' #{customer.cname} '%' or b.email like '%' #{customer.cname} or b.phone like '%' #{customer.cname} )
+	    </if>
+	    <if test="start!=null and ''!=start">
+            <![CDATA[   and a.tptime >= #{start} ]]>  
+        </if>
+         <if test="end!=null and ''!=end">
+            <![CDATA[   and a.tptime <= #{end} ]]>  
+        </if>
+        <if test="date != null and ''!=date">
+            and c.date = #{date}
+        </if>
+        <if test="schedular!=null and schedular.flight!=null and schedular.flight.id != null">
+            and d.id = #{schedular.flight.id}
+        </if>
+	</select>
+	
+	
+	
+	
+</mapper>

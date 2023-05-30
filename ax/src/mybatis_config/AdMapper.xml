@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.info.AdDao">
+    <select id="findList" parameterType="ad" resultType="ad" >
+        select 
+           a.id as "id",
+           a.cover as "cover",
+           a.title as "title",
+           a.link as "link",
+           a.isshow as "isshow"   
+        from ad a
+        where 1 = 1
+     
+        <if test="title!=null and ''!=title">
+            and (a.title like '%' #{title} '%' )
+        </if>
+        <if test="isshow!=null and ''!=isshow">
+            and a.isshow = #{isshow}
+        </if>
+       
+        order by isshow desc
+        <if test="page!=null and rows!=null">
+            limit #{page},#{rows}
+        </if>
+        
+    </select>
+    
+    
+    <select id="findOne"  parameterType="ad" resultType="ad"  >
+        select 
+           a.id as "id",
+           a.cover as "cover",
+           a.title as "title",
+           a.link as "link",
+           a.isshow   
+        from ad a
+        where a.id = #{id}
+    </select>
+    
+    
+    
+      <select id="count" parameterType="ad" resultType="int" >
+        select 
+           count(*)
+        from ad a
+        where 1 = 1
+     
+        <if test="title!=null and ''!=title">
+            and (a.title like '%' #{title} '%' )
+        </if>
+        <if test="isshow!=null and ''!=isshow">
+            and a.isshow = #{isshow}
+        </if>
+    </select>
+    
+    <insert id="add" parameterType="ad" >
+        insert into ad(title,link,cover,isshow,id) values (#{title},#{link},#{cover},#{isshow},#{id})
+    </insert>
+    
+    <update id="update" parameterType="ad">
+		update ad set
+    	<trim suffixOverrides=",">
+			<if test="title!=null">title=#{title},</if>
+			<if test="cover!=null">cover=#{cover},</if>
+			<if test="isshow!=null">isshow=#{isshow},</if>
+			<if test="link!=null">link=#{link},</if>
+		</trim>
+		<where>id=#{id}</where>        
+    </update>
+    
+    
+    
+    <delete id="delete" parameterType="ad">
+        delete from ad where id = #{id} 
+    </delete>
+    
+    
+    
+</mapper>

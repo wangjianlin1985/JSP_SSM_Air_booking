@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.fly.FlightDao">
+    
+   
+	<select id="findOne" parameterType="flight" resultType="flight">
+		select 
+			a.id as "id",
+			a.code as "code",
+			a.origincity as "origincity.id",
+			b.name as "origincity.name",
+			a.destinationcity as "destinationcity.id",
+			c.name as "destinationcity.name",
+			a.originport as "originport.id",
+			d.name as "originport.name",
+			a.destinationport as "destinationport.id",
+			e.name as "destinationport.name",
+			a.start as "start",
+			a.end as "end",
+			a.weeks as "weeks",
+			a.planeid as "plane.id",
+			f.name as "plane.name",
+			f.total as "plane.total",
+			f.colnum as "plane.colnum"
+		from flight a 
+		left join city b on a.origincity = b.id
+		left join city c on a.destinationcity = c.id
+		left join airport d on a.originport = d.id
+		left join airport e on a.destinationport = e.id
+		left join plane f on a.planeid = f.id where a.id = #{id}
+	</select>
+    
+	
+	<select id="findList" parameterType="flight" resultType="flight">
+		select 
+			a.id as "id",
+			a.code as "code",
+			a.origincity as "origincity.id",
+			b.name as "origincity.name",
+			a.destinationcity as "destinationcity.id",
+			c.name as "destinationcity.name",
+			a.originport as "originport.id",
+			d.name as "originport.name",
+			a.destinationport as "destinationport.id",
+			e.name as "destinationport.name",
+			a.start as "start",
+			a.end as "end",
+			a.weeks as "weeks",
+			a.planeid as "plane.id",
+			f.name as "plane.name"
+		from flight a 
+		left join city b on a.origincity = b.id
+		left join city c on a.destinationcity = c.id
+		left join airport d on a.originport = d.id
+		left join airport e on a.destinationport = e.id
+		left join plane f on a.planeid = f.id where 1 = 1
+		<if test="code != null and ''!= code">
+		    and a.code like '%' #{code} '%'
+		</if>
+		<if test="origincity!=null and origincity.id !=null">
+		    and a.origincity = #{origincity.id}
+		</if>
+		<if test="origincity!=null and origincity.name !=null and ''!=origincity.name">
+		    and b.name = #{origincity.name}
+		</if>
+		
+		<if test="destinationcity!=null and destinationcity.id !=null">
+		    and a.destinationcity = #{destinationcity.id}
+		</if>
+		<if test="destinationcity!=null and destinationcity.name !=null and ''!=destinationcity.name">
+		    and c.name = #{destinationcity.name}
+		</if>
+		<if test="plane!=null and plane.id !=null">
+		    and a.planeid = #{plane.id}
+		</if>
+		
+        <if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	
+
+	<select id="count" parameterType="flight" resultType="int">
+		select 
+			count(*)
+		from flight a 
+		left join city b on a.origincity = b.id
+		left join city c on a.destinationcity = c.id
+		left join airport d on a.originport = d.id
+		left join airport e on a.destinationport = e.id
+		left join plane f on a.planeid = f.id where 1 = 1
+		<if test="code != null and ''!= code">
+		    and a.code like '%' #{code} '%'
+		</if>
+		<if test="origincity!=null and origincity.id !=null">
+		    and a.origincity = #{origincity.id}
+		</if>
+		<if test="origincity!=null and origincity.name !=null and ''!=origincity.name">
+		    and b.name = #{origincity.name}
+		</if>
+		
+		<if test="destinationcity!=null and destinationcity.id !=null">
+		    and a.destinationcity = #{destinationcity.id}
+		</if>
+		<if test="destinationcity!=null and destinationcity.name !=null and ''!=destinationcity.name">
+		    and c.name = #{destinationcity.name}
+		</if>
+		<if test="plane!=null and plane.id !=null">
+		    and a.planeid = #{plane.id}
+		</if>
+	</select>
+	
+	
+	
+	<insert id="add" parameterType="flight">
+		insert into flight(id,code,origincity,originport,destinationcity,destinationport,planeid,start,end,weeks) 
+			values(#{id},#{code},#{origincity.id},#{originport.id},#{destinationcity.id},#{destinationport.id},#{plane.id},#{start},#{end},#{weeks})
+	</insert>
+	
+	<update id="update" parameterType="flight">
+		update flight set
+    	<trim suffixOverrides=",">
+			<if test="code!=null">code=#{code},</if>
+			<if test="start!=null">start=#{start},</if>
+			<if test="end!=null">end=#{end},</if>
+			<if test="weeks!=null">weeks=#{weeks},</if>
+			<if test="origincity!=null and origincity.id !=null">origincity=#{origincity.id},</if>
+			<if test="originport!=null and originport.id !=null">originport=#{originport.id},</if>
+			<if test="destinationcity!=null and destinationcity.id !=null">destinationcity=#{destinationcity.id},</if>
+			<if test="destinationport!=null and destinationport.id !=null">destinationport=#{destinationport.id},</if>
+			<if test="plane!=null and plane.id !=null">planeid=#{plane.id},</if>
+		</trim>
+		<where>id=#{id}</where>
+	</update>
+	
+	
+	<delete id="delete" parameterType="flight">
+		delete from flight where id = #{id}
+	</delete>
+	
+	
+	<delete id="deleteBatch" parameterType="java.util.List">
+		delete from flight 
+		WHERE id IN(
+		<foreach item="o" collection="list" open="" separator="," close="" >
+			#{o.id}
+		</foreach>
+		)
+	</delete>
+	
+	
+</mapper>

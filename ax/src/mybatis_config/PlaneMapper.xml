@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.info.PlaneDao">
+	
+	<select id="findList" parameterType="plane" resultType="plane">
+		select id,name,mfr,colnum,model,total,remarks from plane where 1 = 1
+        <if test="name != null and '' != name">  
+            <![CDATA[  
+              AND name like '%' #{name} '%'  
+            ]]>  
+        </if>
+        <if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	
+
+	<select id="count" parameterType="plane" resultType="int">
+		select count(*) from plane  where 1 = 1
+        <if test="name != null and '' != name">  
+            <![CDATA[  
+              AND name like '%' #{name} '%'  
+            ]]>  
+        </if>
+	</select>
+	
+	
+	
+	<insert id="add" parameterType="plane">
+		insert into plane(id,name,colnum,mfr,total,remarks,model) 
+			values(#{id},#{name},#{colnum},#{mfr},#{total},#{remarks},#{model})
+	</insert>
+	
+	
+	<update id="update" parameterType="plane">
+		update plane set
+    	<trim suffixOverrides=",">
+			<if test="name!=null">name=#{name},</if>
+			<if test="model!=null">model=#{model},</if>
+			<if test="colnum!=null">colnum=#{colnum},</if>
+			<if test="mfr!=null">mfr=#{mfr},</if>
+			<if test="remarks!=null">remarks=#{remarks},</if>
+			<if test="total!=null">total=#{total},</if>
+		</trim>
+		<where>id=#{id}</where>
+	</update>
+	
+	
+	<delete id="delete" parameterType="plane">
+		delete from plane where id = #{id}
+	</delete>
+	
+	
+	<delete id="deleteBatch" parameterType="java.util.List">
+		delete from plane 
+		WHERE id IN(
+		<foreach item="o" collection="list" open="" separator="," close="" >
+			#{o.id}
+		</foreach>
+		)
+	</delete>
+	
+	
+</mapper>

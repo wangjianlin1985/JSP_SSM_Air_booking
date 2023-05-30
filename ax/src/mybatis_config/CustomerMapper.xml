@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.front.CustomerDao">
+	
+	<select id="findList" parameterType="customer" resultType="customer">
+		select id,sex,idcardno,birth,email,phone,password,cname,ename,regtime
+		from customer
+		where 1 = 1 
+		<if test="cname != null and '' != cname">  
+            <![CDATA[  
+              AND cname like '%' #{cname} '%'  
+            ]]>  
+        </if>
+		<if test="phone != null and '' != phone">  
+            <![CDATA[  
+              AND phone like '%' #{phone} '%'  
+            ]]>  
+        </if>
+		<if test="email != null and '' != email">  
+            <![CDATA[  
+              AND email like '%' #{email} '%'  
+            ]]>  
+        </if>
+		order by regtime desc
+		<if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	
+	<select id="findOne" parameterType="customer" resultType="customer">
+		select id,sex,idcardno,birth,email,phone,password,cname,ename,regtime
+		from customer
+		where id = #{id}
+	</select>
+	
+	<select id="checkExist" parameterType="java.util.Map" resultType="customer">
+		select id,sex,idcardno,birth,email,phone,password,cname,ename,regtime
+		from customer
+		<if test="type==1">
+		    where idcardno = #{keyword}
+		</if>
+		<if test="type==2">
+		    where email = #{keyword}
+		</if>
+		<if test="type==3">
+		    where phone = #{keyword}
+		</if>
+	</select>
+	
+	<select id="findCustomerByKeyword" parameterType="java.util.Map" resultType="customer">
+		select id,sex,idcardno,birth,email,email,password,cname,ename,regtime,phone
+		from customer
+		where (idcardno = #{keyword})
+		or (phone = #{keyword})
+		or (email = #{keyword})
+	</select>
+	
+
+	<select id="login" parameterType="java.util.Map" resultType="customer">
+		select id,sex,idcardno,birth,email,email,password,cname,ename,regtime,phone
+		from customer
+		where (idcardno = #{keyword} and password = #{password})
+		or (phone = #{keyword} and password = #{password})
+		or (email = #{keyword} and password = #{password})
+	</select>
+	
+	
+	<select id="count" parameterType="customer" resultType="int">
+		select count(*)
+		from customer
+		where 1 = 1 
+		<if test="cname != null and '' != cname">  
+            <![CDATA[  
+              AND cname like '%' #{cname} '%'  
+            ]]>  
+        </if>
+		<if test="phone != null and '' != phone">  
+            <![CDATA[  
+              AND phone like '%' #{phone} '%'  
+            ]]>  
+        </if>
+		<if test="email != null and '' != email">  
+            <![CDATA[  
+              AND email like '%' #{email} '%'  
+            ]]>  
+        </if>
+	</select>
+	
+	
+	
+	<insert id="add" parameterType="customer">
+		insert into customer(id,sex,idcardno,birth,email,phone,password,cname,ename,regtime) 
+			values(#{id},#{sex},#{idcardno},#{birth},#{email},#{phone},#{password},#{cname},#{ename},#{regtime})
+	</insert>
+	
+	
+	<update id="update" parameterType="customer">
+		update customer set
+    	<trim suffixOverrides=",">
+			<if test="sex!=null">sex=#{sex},</if>
+			<if test="idcardno!=null">idcardno=#{idcardno},</if>
+			<if test="birth!=null">birth=#{birth},</if>
+			<if test="email!=null">email=#{email},</if>
+			<if test="phone!=null">phone=#{phone},</if>
+			<if test="cname!=null">cname=#{cname},</if>
+			<if test="ename!=null">ename=#{ename},</if>
+		</trim>
+		<where>id=#{id}</where>
+	</update>
+	
+	<update id="updatePassword" parameterType="java.util.Map">
+	    update customer set password = #{password} where id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="customer">
+		delete from customer where id = #{id}
+	</delete>
+	
+	
+	<delete id="deleteBatch" parameterType="java.util.List">
+		delete from customer 
+		WHERE id IN(
+		<foreach item="o" collection="list" open="" separator="," close="" >
+			#{o.id}
+		</foreach>
+		)
+	</delete>
+	
+	
+</mapper>

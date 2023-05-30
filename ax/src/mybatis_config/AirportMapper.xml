@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dingzhen.dao.info.AirportDao">
+	
+	<select id="findList" parameterType="airport" resultType="airport">
+		select a.id,a.name,a.remarks,b.id as "city.id",b.name as "city.name" 
+		from airport a left join city b on a.cityid = b.id where 1 = 1
+        <if test="city != null and city.id != null  and '' != city.id">  
+            <![CDATA[  
+              AND a.cityid = #{city.id} 
+            ]]>  
+        </if>
+        <if test="keyword != null and ''!= keyword">
+			AND (a.name like '%' #{keyword} '%' or  b.name like '%' #{keyword} '%')      
+        </if>
+        
+        <if test="name != null and '' != name">  
+            <![CDATA[  
+              AND a.name like '%' #{name} '%'  
+            ]]>  
+        </if>
+        <if test="page != null and rows != null" >           
+              limit #{page}, #{rows} 
+        </if>
+	</select>
+	
+	
+
+	<select id="count" parameterType="airport" resultType="int">
+		select count(*) 
+		from airport a left join city b on a.cityid = b.id where 1 = 1
+        <if test="city != null and city.id != null  and '' != city.id">  
+            <![CDATA[  
+              AND a.cityid = #{city.id} 
+            ]]>  
+        </if>
+        <if test="keyword != null and ''!= keyword">
+			AND (a.name like '%' #{keyword} '%' or  b.name like '%' #{keyword} '%')      
+        </if>
+        <if test="name != null and '' != name">  
+            <![CDATA[  
+              AND a.name like '%' #{name} '%'  
+            ]]>  
+        </if>
+	</select>
+	
+	
+	
+	<insert id="add" parameterType="airport">
+		insert into airport(id,name,remarks,cityid) 
+			values(#{id},#{name},#{remarks},#{city.id})
+	</insert>
+	
+	
+	<update id="update" parameterType="airport">
+		update airport set
+    	<trim suffixOverrides=",">
+			<if test="name!=null">name=#{name},</if>
+			<if test="remarks!=null">remarks=#{remarks},</if>
+			<if test="city!=null and city.id!=null">cityid=#{city.id},</if>
+		</trim>
+		<where>id=#{id}</where>
+	</update>
+	
+	
+	<delete id="delete" parameterType="airport">
+		delete from airport where id = #{id}
+	</delete>
+	
+	
+	<delete id="deleteBatch" parameterType="java.util.List">
+		delete from airport 
+		WHERE id IN(
+		<foreach item="o" collection="list" open="" separator="," close="" >
+			#{o.id}
+		</foreach>
+		)
+	</delete>
+	
+	
+</mapper>
